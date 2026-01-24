@@ -14,5 +14,9 @@ class InstalledApps extends _InstalledAppsPlatforms with _InstalledAppsImpl {
 
   static List<AppInfo> userApps = [];
   static InstalledApps get instance => _instance;
+
+  factory InstalledApps() => _instance;
   InstalledApps._internal();
+
 }
+

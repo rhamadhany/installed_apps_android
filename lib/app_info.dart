@@ -21,11 +21,27 @@ class AppInfo {
     required this.lastUpdateTime,
   });
 
+  factory AppInfo.empty()=>
+      AppInfo(
+        name: "",
+        packageName: "",
+        icon: Uint8List(0),
+        isSystem: false,
+        versionName: "",
+        versionCode: 0,
+        installTime: 0,
+        lastUpdateTime: 0,
+
+      );
+
   factory AppInfo.fromJson(Map<String, dynamic> json) {
+    final icon = json["icon"] is Uint8List ? json["icon"] : Uint8List.fromList(
+        List<int>.from(json["icon"]));
     return AppInfo(
       name: json["name"],
       packageName: json["packageName"],
-      icon: json["icon"],
+      icon: icon,
+
       isSystem: json["isSystem"],
       versionName: json["versionName"],
       versionCode: json["versionCode"],
