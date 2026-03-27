@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.os.Build
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -69,13 +70,20 @@ object InstalledApps {
                             val icon = appInfo.applicationInfo?.loadIcon(pm)
                                 .let { createBitmap(it) }
 
+                            val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                appInfo.longVersionCode
+                            } else {
+                                @Suppress("DEPRECATION")
+                                appInfo.versionCode.toLong()
+                            }
+
                             val map = mapOf<String, Any>(
                                 "name" to name,
                                 "packageName" to appInfo.packageName,
                                 "icon" to icon,
                                 "isSystem" to isSystem,
                                 "versionName" to (appInfo.versionName ?: ""),
-                                "versionCode" to appInfo.longVersionCode,
+                                "versionCode" to versionCode,
                                 "installTime" to appInfo.firstInstallTime,
                                 "lastUpdateTime" to appInfo.lastUpdateTime
                             )

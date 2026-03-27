@@ -21,6 +21,9 @@ mixin _InstalledAppsImpl implements _InstalledAppsPlatforms {
     })
         .toList();
 
+    InstalledApps.listAppsPackages =
+        InstalledApps.listApps.map((e) => e.packageName,).toList();
+
     return InstalledApps.listApps;
   }
 
