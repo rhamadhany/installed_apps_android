@@ -61,9 +61,18 @@ object InstalledApps {
         CoroutineScope(Dispatchers.Default).launch {
             val pm = context.packageManager
             val packages = pm.getInstalledPackages(0)
-            val parallelList =
-                packages.mapNotNull { appInfo ->
-                    async {
+            
+            // Get number of available CPU cores
+            val numCores = Runtime.getRuntime().availableProcessors()
+            
+            // Chunk packages based on number of cores
+            val chunkSize = (packages.size + numCores - 1) / numCores
+            val chunks = packages.chunked(chunkSize.coerceAtLeast(1))
+            
+            // Process each chunk in parallel
+            val parallelChunks = chunks.map { chunk ->
+                async {
+                    chunk.mapNotNull { appInfo ->
                         try {
                             val name = appInfo.applicationInfo?.loadLabel(pm)?.toString() ?: appInfo.packageName
                             val isSystem = appInfo.applicationInfo?.flags?.and(ApplicationInfo.FLAG_SYSTEM) != 0
@@ -88,14 +97,17 @@ object InstalledApps {
                         }
                     }
                 }
+            }
 
-            val listResult = parallelList.awaitAll().filterNotNull()
+            // Await all chunks and flatten results
+            val listResult = parallelChunks.awaitAll()
+                .flatten()
+                .filterNotNull()
                 .sortedBy {
                     (it["name"] as String)
                 }
 
             withContext(Dispatchers.Main) {
-
                 result.success(listResult)
             }
         }
