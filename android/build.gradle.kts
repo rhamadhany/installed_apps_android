@@ -27,10 +27,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-//    kotlinOptions {
-  //      jvmTarget = "11"
-    //}
-
     kotlin {
         compilerOptions {
             jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
@@ -48,18 +44,11 @@ android {
     }
 
     val flutter: String by lazy {
-        val localProps = file("local.properties")
-        if (localProps.exists()) {
-            Properties().let { properties ->
-                localProps.inputStream().use {
-                    properties.load(it)
-                    properties.getProperty("flutter.sdk") + "/bin/cache/artifacts/engine/android-arm64/flutter.jar"
-                }
-            }
-        } else {
-            val flutterRoot = System.getenv("FLUTTER_ROOT") ?: System.getenv("FLUTTER_HOME") ?: error("FLUTTER_ROOT not set")
-            "$flutterRoot/bin/cache/artifacts/engine/android-arm64/flutter.jar"
-        }
+        val flutterRoot = rootProject.findProperty("flutter.sdk") as? String
+            ?: System.getenv("FLUTTER_ROOT")
+            ?: System.getenv("FLUTTER_HOME")
+            ?: error("flutter.sdk not found (set FLUTTER_ROOT or gradle property)")
+        "$flutterRoot/bin/cache/artifacts/engine/android-arm64/flutter.jar"
     }
 
     dependencies {
