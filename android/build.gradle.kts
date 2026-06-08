@@ -47,11 +47,18 @@ android {
         minSdk = 21
     }
 
-    val flutter = Properties().let { propeties ->
-        file("local.properties").inputStream().use {
-            propeties.load(it).run {
-                propeties.getProperty("flutter.sdk") + "/bin/cache/artifacts/engine/android-arm64/flutter.jar"
+    val flutter: String by lazy {
+        val localProps = file("local.properties")
+        if (localProps.exists()) {
+            Properties().let { properties ->
+                localProps.inputStream().use {
+                    properties.load(it)
+                    properties.getProperty("flutter.sdk") + "/bin/cache/artifacts/engine/android-arm64/flutter.jar"
+                }
             }
+        } else {
+            val flutterRoot = System.getenv("FLUTTER_ROOT") ?: System.getenv("FLUTTER_HOME") ?: error("FLUTTER_ROOT not set")
+            "$flutterRoot/bin/cache/artifacts/engine/android-arm64/flutter.jar"
         }
     }
 
