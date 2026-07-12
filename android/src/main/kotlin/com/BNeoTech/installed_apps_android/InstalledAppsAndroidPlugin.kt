@@ -64,9 +64,10 @@ object InstalledApps {
             
             // Get number of available CPU cores
             val numCores = Runtime.getRuntime().availableProcessors()
+            val numChunks = numCores * 2
             
-            // Chunk packages based on number of cores
-            val chunkSize = (packages.size + numCores - 1) / numCores
+            // Chunk packages based on number of cores * 2
+            val chunkSize = (packages.size + numChunks - 1) / numChunks
             val chunks = packages.chunked(chunkSize.coerceAtLeast(1))
             
             // Process each chunk in parallel
@@ -103,9 +104,6 @@ object InstalledApps {
             val listResult = parallelChunks.awaitAll()
                 .flatten()
                 .filterNotNull()
-                .sortedBy {
-                    (it["name"] as String)
-                }
 
             withContext(Dispatchers.Main) {
                 result.success(listResult)

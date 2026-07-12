@@ -1,6 +1,8 @@
+import 'dart:isolate';
 import 'package:flutter/services.dart';
 
 import 'app_info.dart';
+import 'isolate_worker.dart';
 
 part 'installed_apps_impl.dart';
 part 'installed_apps_platforms.dart';

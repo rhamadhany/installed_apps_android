@@ -4,25 +4,14 @@ mixin _InstalledAppsImpl implements _InstalledAppsPlatforms {
   Future<List<AppInfo>> getInstalledApps(
       [List<String> excludes = const []]) async {
     final result = await invokeGetInstalledApps();
-    clearList();
 
-    final excludeSet = excludes.toSet();
+    // Offload heavy processing to a separate isolate
+    final processed = await Isolate.run(() => processAppsInIsolate((result as List<dynamic>, excludes)));
 
-    InstalledApps.listApps = (result as List)
-        .map((e) => AppInfo.fromJson(Map<String, dynamic>.from(e)))
-        .where((appInfo) => !excludeSet.contains(appInfo.packageName))
-        .map((appInfo) {
-      if (appInfo.isSystem) {
-        InstalledApps.systemApps.add(appInfo);
-      } else {
-        InstalledApps.userApps.add(appInfo);
-      }
-      return appInfo;
-    })
-        .toList();
-
-    InstalledApps.listAppsPackages =
-        InstalledApps.listApps.map((e) => e.packageName,).toList();
+    InstalledApps.listApps = processed.apps;
+    InstalledApps.systemApps = processed.system;
+    InstalledApps.userApps = processed.user;
+    InstalledApps.listAppsPackages = processed.packages;
 
     return InstalledApps.listApps;
   }
