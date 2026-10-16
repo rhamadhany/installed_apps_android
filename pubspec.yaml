@@ -1,7 +1,7 @@
 name: installed_apps_android
-description: "A new Flutter plugin project."
-version: 0.0.1
-homepage:
+description: "A Flutter plugin to enumerate installed Android apps with icons."
+version: 0.1.0
+homepage: https://github.com/rhamadhany/installed_apps_android
 
 environment:
   sdk: ^3.9.0
